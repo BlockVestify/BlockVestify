@@ -2,9 +2,17 @@ import React from 'react';
 import { Users, DollarSign, ShoppingCart, TrendingUp } from 'lucide-react';
 import Sidebar from './components/Sidebar';
 import Widget from './components/Widget';
+import SignupPage from './pages/SignupPage';
 import './styles/dashboard.css';
 
 function App() {
+  // Temporary toggle for demo purposes
+  const showSignup = true;
+
+  if (showSignup) {
+    return <SignupPage />;
+  }
+
   return (
     <div className="dashboard">
       <Sidebar />
@@ -46,7 +54,6 @@ function App() {
 
         <div className="chart-container">
           <h3 className="widget-title">Monthly Overview</h3>
-          {/* Chart component would go here */}
           <p style={{ textAlign: 'center', padding: '2rem' }}>Chart Placeholder</p>
         </div>
       </main>

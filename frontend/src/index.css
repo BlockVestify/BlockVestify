@@ -1,4 +1,3 @@
-@import './styles/dashboard.css';
 /* Reset default styles */
 * {
   margin: 0;
@@ -14,3 +13,4 @@ body {
 }
 
 /* Import dashboard styles */
+@import './styles/dashboard.css';
