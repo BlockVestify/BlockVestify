@@ -1,0 +1,39 @@
+'use strict';
+
+const { Contract } = require('fabric-contract-api');
+
+class AssetTokenizationContract extends Contract {
+
+    async initLedger(ctx) {
+        console.log('Initializing Ledger...');
+        // Initialize with sample assets
+        const assets = [
+            {
+                assetId: 'asset1',
+                owner: '',
+                value: 100000,
+                tokensIssued: 0
+            }
+        ];
+        for (const asset of assets) {
+            await ctx.stub.putState(asset.assetId, Buffer.from(JSON.stringify(asset)));
+        }
+        console.log('Ledger initialized.');
+    }
+
+    async purchaseTokens(ctx, assetId, buyer, tokenAmount) {
+        const assetAsBytes = await ctx.stub.getState(assetId);
+        if (!assetAsBytes || assetAsBytes.length === 0) {
+            throw new Error(`Asset ${assetId} does not exist`);
+        }
+        const asset = JSON.parse(assetAsBytes.toString());
+
+        asset.tokensIssued += tokenAmount;
+        asset.owner = buyer;
+
+        await ctx.stub.putState(assetId, Buffer.from(JSON.stringify(asset)));
+        return `Purchased ${tokenAmount} tokens of ${assetId}`;
+    }
+}
+
+module.exports = AssetTokenizationContract;
