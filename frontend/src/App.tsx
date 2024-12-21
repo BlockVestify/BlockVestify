@@ -1,78 +1,148 @@
 import React from 'react';
 import { Users, DollarSign, ShoppingCart, TrendingUp } from 'lucide-react';
+import { BrowserRouter as Router, Route, Routes, Navigate, useLocation } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
 import Widget from './components/Widget';
 import SignupPage from './pages/SignupPage';
 import AssetsList from './components/assets/AssetsList';
-import BondList from './components/bonds/BondList';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import BondPage from './pages/BondPage';
 import BondsPage from './pages/BondsPage';
 import InvestmentPage from './pages/InvestmentPage';
+import AnalyticsPage from './pages/AnalyticsPage';
+import { UserProvider, useUser } from './contexts/UserContext';
 import './styles/dashboard.css';
 import './styles/bond.css';
 import './styles/bonds.css';
 import './styles/investment.css';
+import './styles/analytics.css';
+import './styles/loading.css';
 
-function App() {
-  // Temporary toggle for demo purposes
-  const showSignup = false;
+const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { user, loading } = useUser();
+  const location = useLocation();
 
-  if (showSignup) {
-    return <SignupPage />;
+  if (loading) {
+    return (
+      <div className="loading-screen">
+        <div className="loading-spinner"></div>
+        <p>Loading your dashboard...</p>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <Navigate to="/auth" state={{ from: location }} replace />;
+  }
+
+  return <>{children}</>;
+};
+
+const DashboardContent = () => {
+  const { user } = useUser();
+  
+  if (!user) {
+    return <Navigate to="/auth" />;
   }
 
   return (
-    <Router>
-      <div className="dashboard">
-        <Sidebar />
-        <main className="main-content">
-          <Routes>
-            <Route path="/" element={
-              <>
-                <header className="header">
-                  <h2 className="welcome-text">Welcome back, Admin</h2>
-                </header>
-                <div className="widgets">
-                  <Widget 
-                    title="Total Bonds"
-                    value="15"
-                    description="Active bonds in your portfolio"
-                    icon={Users}
-                  />
-                  <Widget 
-                    title="Total Value"
-                    value="$250,000"
-                    description="Current portfolio value"
-                    icon={DollarSign}
-                  />
-                  <Widget 
-                    title="Investments"
-                    value="8"
-                    description="Active investments"
-                    icon={ShoppingCart}
-                  />
-                  <Widget 
-                    title="Returns"
-                    value="+12.5%"
-                    description="Portfolio performance"
-                    icon={TrendingUp}
-                  />
-                </div>
-                <div className="main-lists">
-                  <div className="assets-section">
-                    <h3>Your Assets</h3>
-                    <AssetsList />
-                  </div>
-                </div>
-              </>
-            } />
-            <Route path="/bonds" element={<BondsPage />} />
-            <Route path="/bond/:bondId" element={<BondPage />} />
-            <Route path="/investments" element={<InvestmentPage />} />
-          </Routes>
-        </main>
+    <>
+      <header className="header">
+        <h2 className="welcome-text">
+          Welcome back, {user.username}!
+        </h2>
+      </header>
+      <div className="widgets">
+        <Widget
+          title="Total Bonds"
+          value={user.bonds?.length.toString() || "0"}
+          description="Active bonds in your portfolio"
+          icon={Users}
+        />
+        <Widget
+          title="Total Value"
+          value={`$${user.totalInvestment?.toLocaleString() || "0"}`}
+          description="Current portfolio value"
+          icon={DollarSign}
+        />
+        <Widget
+          title="Investments"
+          value={user.bonds?.length.toString() || "0"}
+          description="Active investments"
+          icon={ShoppingCart}
+        />
+        <Widget
+          title="Returns"
+          value="+12.5%"
+          description="Portfolio performance"
+          icon={TrendingUp}
+        />
       </div>
+      <div className="main-lists">
+        <div className="assets-section">
+          <h3>Your Assets</h3>
+          <AssetsList />
+        </div>
+      </div>
+    </>
+  );
+};
+
+const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { user, loading } = useUser();
+  const location = useLocation();
+
+  if (loading) {
+    return (
+      <div className="loading-screen">
+        <div className="loading-spinner"></div>
+        <p>One moment please...</p>
+      </div>
+    );
+  }
+
+  if (user) {
+    return <Navigate to="/dashboard" state={{ from: location }} replace />;
+  }
+
+  return <>{children}</>;
+};
+
+function App() {
+  return (
+    <Router>
+      <UserProvider>
+        <Routes>
+          <Route path="/" element={<Navigate to="/auth" replace />} />
+          <Route 
+            path="/auth" 
+            element={
+              <AuthRoute>
+                <SignupPage />
+              </AuthRoute>
+            } 
+          />
+          <Route
+            path="/*"
+            element={
+              <ProtectedRoute>
+                <div className="dashboard">
+                  <Sidebar />
+                  <main className="main-content">
+                    <Routes>
+                      <Route path="/dashboard" element={<DashboardContent />} />
+                      <Route path="/bonds" element={<BondsPage />} />
+                      <Route path="/bond/:bondId" element={<BondPage />} />
+                      <Route path="/investments" element={<InvestmentPage />} />
+                      <Route path="/analytics" element={<AnalyticsPage />} />
+                      <Route path="*" element={<Navigate to="/dashboard" replace />} />
+                    </Routes>
+                  </main>
+                </div>
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
+      </UserProvider>
     </Router>
   );
 }

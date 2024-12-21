@@ -1,9 +1,6 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
 
-interface BondPageParams {
-  bondId: string;
-}
 
 const BondPage: React.FC = () => {
   const { bondId } = useParams<'bondId'>();
