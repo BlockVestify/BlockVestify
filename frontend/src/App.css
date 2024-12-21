@@ -1,65 +1,39 @@
-/* TokenPurchase.css */
-body {
-  font-family: Arial, sans-serif;
-  background-color: #f9fafb;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-}
-
 .token-purchase-container {
   background-color: #ffffff;
-  padding: 20px 30px;
-  border-radius: 10px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   width: 400px;
+  margin: auto;
   text-align: center;
 }
 
 .token-purchase-container h1 {
   font-size: 24px;
   margin-bottom: 20px;
-  color: #333333;
 }
 
 .token-purchase-container input {
-  width: calc(100% - 20px);
+  display: block;
+  width: 90%;
+  margin: 10px auto;
   padding: 10px;
-  margin-bottom: 15px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
   font-size: 16px;
-}
-
-.token-purchase-container input:focus {
-  border-color: #007bff;
-  outline: none;
-  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+  border: 1px solid #ccc;
+  border-radius: 4px;
 }
 
 .token-purchase-container button {
   background-color: #007bff;
-  color: #ffffff;
+  color: white;
   border: none;
-  border-radius: 5px;
   padding: 10px 20px;
   font-size: 16px;
+  border-radius: 4px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.3s;
 }
 
 .token-purchase-container button:hover {
   background-color: #0056b3;
-}
-
-.token-purchase-container button:active {
-  background-color: #003f7f;
-}
-
-.token-purchase-container button:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
 }

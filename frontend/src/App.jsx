@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
-import "../TokenPurchase.css";
-
+import "./TokenPurchase.css"; // Import the CSS file
 
 const TokenPurchase = () => {
   const [tokenAmount, setTokenAmount] = useState(0);
@@ -32,7 +31,7 @@ const TokenPurchase = () => {
         type="number"
         placeholder="Number of Tokens"
         value={tokenAmount}
-        onChange={(e) => setTokenAmount(e.target.value)}
+        onChange={(e) => setTokenAmount(Number(e.target.value))}
       />
       <button onClick={handlePurchase}>Buy</button>
     </div>
