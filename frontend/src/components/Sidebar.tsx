@@ -1,7 +1,14 @@
 import React from 'react';
-import { LayoutDashboard, Users, ShoppingCart, Settings, BarChart2 } from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
+import { LayoutDashboard, Users, ShoppingCart, Settings, BarChart2, Newspaper } from 'lucide-react';
 
 const Sidebar = () => {
+  const location = useLocation();
+
+  const openBondsNews = () => {
+    window.open('https://www.bloomberg.com/markets/rates-bonds', '_blank');
+  };
+
   return (
     <aside className="sidebar">
       <div className="sidebar-header">
@@ -9,26 +16,30 @@ const Sidebar = () => {
         <h1>Dashboard</h1>
       </div>
       <nav className="nav-links">
-        <a href="#" className="nav-link">
+        <Link to="/" className={`nav-link ${location.pathname === '/' ? 'active' : ''}`}>
           <LayoutDashboard size={20} />
-          Dashboard
-        </a>
-        <a href="#" className="nav-link">
+          <span>Dashboard</span>
+        </Link>
+        <Link to="/bonds" className={`nav-link ${location.pathname === '/bonds' ? 'active' : ''}`}>
           <Users size={20} />
-          Bonds  
-        </a>
-        <a href="#" className="nav-link">
+          <span>Your Bonds</span>
+        </Link>
+        <div className="nav-link" onClick={openBondsNews} style={{ cursor: 'pointer' }}>
+          <Newspaper size={20} />
+          <span>Bonds News</span>
+        </div>
+        <Link to="/investments" className={`nav-link ${location.pathname === '/investments' ? 'active' : ''}`}>
           <ShoppingCart size={20} />
-          Investments
-        </a>
-        <a href="#" className="nav-link">
+          <span>Investments</span>
+        </Link>
+        <Link to="/analytics" className={`nav-link ${location.pathname === '/analytics' ? 'active' : ''}`}>
           <BarChart2 size={20} />
-          Analytics
-        </a>
-        <a href="#" className="nav-link">
+          <span>Analytics</span>
+        </Link>
+        <Link to="/settings" className={`nav-link ${location.pathname === '/settings' ? 'active' : ''}`}>
           <Settings size={20} />
-          Settings
-        </a>
+          <span>Settings</span>
+        </Link>
       </nav>
     </aside>
   );

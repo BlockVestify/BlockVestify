@@ -1,0 +1,84 @@
+.bonds-container {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-top: 2rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.bonds-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.bonds-header h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.bonds-list {
+  width: 100%;
+}
+
+.bonds-list-header {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  padding: 0.75rem 1rem;
+  background: #f8fafc;
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: #64748b;
+}
+
+.bond-item {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.bond-item:hover {
+  background: #f1f5f9;
+}
+
+.bond-name {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.bond-icon {
+  color: #64748b;
+}
+
+.bond-owner, .bond-value, .bond-date {
+  display: flex;
+  align-items: center;
+}
+
+.bonds-page {
+  padding: 24px;
+}
+
+.bonds-page .header {
+  margin-bottom: 24px;
+}
+
+.bonds-page h2 {
+  font-size: 24px;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.bonds-content {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
