@@ -15,11 +15,11 @@ const Sidebar = () => {
         </a>
         <a href="#" className="nav-link">
           <Users size={20} />
-          Customers
+          Bonds  
         </a>
         <a href="#" className="nav-link">
           <ShoppingCart size={20} />
-          Orders
+          Investments
         </a>
         <a href="#" className="nav-link">
           <BarChart2 size={20} />
