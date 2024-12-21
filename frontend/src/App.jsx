@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import "./TokenPurchase.css";
 
 const TokenPurchase = () => {
   const [tokenAmount, setTokenAmount] = useState(0);
@@ -18,7 +19,7 @@ const TokenPurchase = () => {
   };
 
   return (
-    <div>
+    <div className="token-purchase-container">
       <h1>Purchase Tokens</h1>
       <input
         type="text"
