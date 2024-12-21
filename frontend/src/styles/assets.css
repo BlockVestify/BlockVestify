@@ -1,0 +1,93 @@
+.assets-container {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  margin-top: 2rem;
+}
+
+.assets-header {
+  padding: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #eee;
+}
+
+.assets-header h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.upload-button {
+  padding: 0.5rem 1rem;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.upload-button:hover {
+  background: #1d4ed8;
+}
+
+.assets-list {
+  padding: 0 1.5rem;
+}
+
+.assets-list-header {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr 40px;
+  padding: 1rem 0;
+  border-bottom: 1px solid #eee;
+  color: #666;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.asset-item {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr 40px;
+  padding: 1rem 0;
+  align-items: center;
+  border-bottom: 1px solid #eee;
+}
+
+.asset-name {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.asset-icon {
+  flex-shrink: 0;
+}
+
+.asset-icon.document {
+  color: #2563eb;
+}
+
+.asset-icon.image {
+  color: #16a34a;
+}
+
+.asset-icon.default {
+  color: #666;
+}
+
+.asset-actions {
+  background: none;
+  border: none;
+  color: #666;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.asset-actions:hover {
+  background: #f5f5f5;
+}

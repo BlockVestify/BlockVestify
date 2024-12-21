@@ -3,11 +3,12 @@ import { Users, DollarSign, ShoppingCart, TrendingUp } from 'lucide-react';
 import Sidebar from './components/Sidebar';
 import Widget from './components/Widget';
 import SignupPage from './pages/SignupPage';
+import AssetsList from './components/assets/AssetsList';
 import './styles/dashboard.css';
 
 function App() {
   // Temporary toggle for demo purposes
-  const showSignup = true;
+  const showSignup = false;
 
   if (showSignup) {
     return <SignupPage />;
@@ -52,10 +53,7 @@ function App() {
           />
         </div>
 
-        <div className="chart-container">
-          <h3 className="widget-title">Monthly Overview</h3>
-          <p style={{ textAlign: 'center', padding: '2rem' }}>Chart Placeholder</p>
-        </div>
+        <AssetsList />
       </main>
     </div>
   );
