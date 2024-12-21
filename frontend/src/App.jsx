@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
-import "./TokenPurchase.css"; // Import the CSS file
+import "./App.css"; // Import the CSS file
 
 const TokenPurchase = () => {
   const [tokenAmount, setTokenAmount] = useState(0);
