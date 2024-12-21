@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
-import "./TokenPurchase.css";
+import "../TokenPurchase.css";
+
 
 const TokenPurchase = () => {
   const [tokenAmount, setTokenAmount] = useState(0);
