@@ -8,9 +8,11 @@ import BondList from './components/bonds/BondList';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import BondPage from './pages/BondPage';
 import BondsPage from './pages/BondsPage';
+import InvestmentPage from './pages/InvestmentPage';
 import './styles/dashboard.css';
 import './styles/bond.css';
 import './styles/bonds.css';
+import './styles/investment.css';
 
 function App() {
   // Temporary toggle for demo purposes
@@ -67,6 +69,7 @@ function App() {
             } />
             <Route path="/bonds" element={<BondsPage />} />
             <Route path="/bond/:bondId" element={<BondPage />} />
+            <Route path="/investments" element={<InvestmentPage />} />
           </Routes>
         </main>
       </div>
