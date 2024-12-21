@@ -9,13 +9,15 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
   "dependencies": {
+    "axios": "^1.7.9",
     "body-parser": "^1.20.3",
     "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
     "express": "^4.21.2",
-    "fabric-network": "^2.2.20"
-  }
- 
-
+    "fabric-network": "^2.2.20",
+    "firebase-admin": "^13.0.2",
+    "jsonwebtoken": "^9.0.2"
+  },
+  "description": ""
 }
