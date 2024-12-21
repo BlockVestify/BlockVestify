@@ -13,9 +13,15 @@
     "axios": "^1.7.9",
     "body-parser": "^1.20.3",
     "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "fabric-network": "^2.2.20",
+<<<<<<< HEAD
     "web3": "^4.16.0"
+=======
+    "firebase-admin": "^13.0.2",
+    "jsonwebtoken": "^9.0.2"
+>>>>>>> 1986f874b138ed3b5e89bac24f894a60a87a7402
   },
   "description": ""
 }
