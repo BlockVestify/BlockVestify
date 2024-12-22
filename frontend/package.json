@@ -17,11 +17,12 @@
     "date-fns": "^4.1.0",
     "ethers": "^6.13.4",
     "firebase": "^11.1.0",
-    "lucide-react": "^0.344.0",
+    "lucide-react": "^0.469.0",
     "react": "^18.3.1",
     "react-chartjs-2": "^5.2.0",
     "react-dom": "^18.3.1",
     "react-toastify": "^11.0.2",
+    "recharts": "^2.15.0",
     "three": "^0.171.0",
     "web3": "^4.16.0"
   },

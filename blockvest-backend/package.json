@@ -16,9 +16,9 @@
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "fabric-network": "^2.2.20",
-    "web3": "^4.16.0",
     "firebase-admin": "^13.0.2",
-    "jsonwebtoken": "^9.0.2"
+    "jsonwebtoken": "^9.0.2",
+    "web3": "^4.16.0"
   },
   "description": ""
 }

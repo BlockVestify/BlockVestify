@@ -1,135 +1,128 @@
-// Import necessary modules
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const jwt = require('jsonwebtoken');
-const firebaseAdmin = require('firebase-admin');
+const admin = require('firebase-admin');
 const dotenv = require('dotenv');
 
 // Load environment variables
 dotenv.config();
 
-// Import blockchain module
-const { initializeBlockchain, createToken, transferToken } = require('./blockchain'); // Hyperledger logic placeholder
-const { fetchPrice } = require('./chainlink'); // Chainlink API logic placeholder
+// Initialize Firebase Admin
+const serviceAccount = require('./firebase-service-account.json');
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  databaseURL: "https://blockvest-bc812-default-rtdb.asia-southeast1.firebasedatabase.app"
+});
 
-// Initialize app
+const db = admin.firestore();
 const app = express();
-const PORT = process.env.PORT || 5000;
+const port = process.env.PORT || 3000;
 
 // Middleware
 app.use(cors());
 app.use(bodyParser.json());
 
-// Initialize Firebase
-const serviceAccount = require('./firebase-service-account.json');
-firebaseAdmin.initializeApp({
-  credential: firebaseAdmin.credential.cert(serviceAccount),
-});
-const db = firebaseAdmin.firestore();
-
-// Authentication Middleware
-const authenticate = (req, res, next) => {
-  const token = req.headers['authorization'];
-  if (!token) return res.status(403).json({ error: 'No token provided' });
-
-  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
-    if (err) return res.status(500).json({ error: 'Failed to authenticate token' });
-    req.userId = decoded.id;
-    next();
-  });
-};
-
-// Routes
-
-// User Registration
-app.post('/register', async (req, res) => {
+// Authentication middleware
+const authenticateUser = async (req, res, next) => {
   try {
-    const { email, password } = req.body;
-    const userRecord = await firebaseAdmin.auth().createUser({
-      email,
-      password,
-    });
-
-    res.status(201).json({ message: 'User registered successfully', userId: userRecord.uid });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// User Login
-app.post('/login', async (req, res) => {
-  try {
-    const { email, password } = req.body;
-    const user = await firebaseAdmin.auth().getUserByEmail(email);
-
-    // In a real application, validate the password securely
-    const token = jwt.sign({ id: user.uid }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    res.status(200).json({ token });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// Create Tokenized Asset
-app.post('/assets', authenticate, async (req, res) => {
-  try {
-    const { assetName, assetValue } = req.body;
-    const tokenId = await createToken(assetName, assetValue);
-
-    await db.collection('assets').doc(tokenId).set({
-      assetName,
-      assetValue,
-      ownerId: req.userId,
-    });
-
-    res.status(201).json({ message: 'Asset tokenized successfully', tokenId });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// Fetch Asset Details
-app.get('/assets/:tokenId', authenticate, async (req, res) => {
-  try {
-    const { tokenId } = req.params;
-    const assetDoc = await db.collection('assets').doc(tokenId).get();
-
-    if (!assetDoc.exists) {
-      return res.status(404).json({ error: 'Asset not found' });
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ error: 'Unauthorized' });
     }
 
-    res.status(200).json(assetDoc.data());
+    const token = authHeader.split('Bearer ')[1];
+    const decodedToken = await admin.auth().verifyIdToken(token);
+    req.user = decodedToken;
+    next();
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Authentication error:', error);
+    res.status(401).json({ error: 'Unauthorized' });
   }
+};
+
+// Basic health check route
+app.get('/', (req, res) => {
+  res.json({ status: 'Server is running' });
 });
 
-// Transfer Tokenized Asset
-app.post('/transfer', authenticate, async (req, res) => {
+// Routes
+app.get('/api/user/:uid', authenticateUser, async (req, res) => {
   try {
-    const { tokenId, recipientId } = req.body;
-    await transferToken(tokenId, recipientId);
+    const { uid } = req.params;
+    const userDoc = await db.collection('users').doc(uid).get();
+    
+    if (!userDoc.exists) {
+      return res.status(404).json({ error: 'User not found' });
+    }
 
-    res.status(200).json({ message: 'Token transferred successfully' });
+    res.json(userDoc.data());
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
-// Fetch Real-Time Price Data
-app.get('/price/:asset', async (req, res) => {
+app.get('/api/bonds/:address', authenticateUser, async (req, res) => {
   try {
-    const { asset } = req.params;
-    const price = await fetchPrice(asset);
+    const { address } = req.params;
+    const bondsSnapshot = await db.collection('bonds')
+      .where('owner', '==', address)
+      .get();
 
-    res.status(200).json({ asset, price });
+    const bonds = [];
+    bondsSnapshot.forEach(doc => {
+      bonds.push({ id: doc.id, ...doc.data() });
+    });
+
+    res.json({ bonds });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
-// Start Server
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+app.post('/api/bonds/purchase', authenticateUser, async (req, res) => {
+  try {
+    const { name, value, maturityTime, interestRate, owner } = req.body;
+    
+    const bondRef = await db.collection('bonds').add({
+      name,
+      value,
+      maturityTime,
+      interestRate,
+      owner,
+      purchaseTime: admin.firestore.FieldValue.serverTimestamp(),
+      isActive: true
+    });
+
+    const userRef = db.collection('users').doc(owner);
+    await db.runTransaction(async (transaction) => {
+      const userDoc = await transaction.get(userRef);
+      if (!userDoc.exists) {
+        throw new Error('User not found');
+      }
+
+      const userData = userDoc.data();
+      const updatedBonds = [...(userData.bonds || []), bondRef.id];
+      const updatedTotalInvestment = (userData.totalInvestment || 0) + parseFloat(value);
+
+      transaction.update(userRef, { 
+        bonds: updatedBonds,
+        totalInvestment: updatedTotalInvestment
+      });
+    });
+
+    res.json({ 
+      success: true, 
+      bondId: bondRef.id 
+    });
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Start server
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
 });

@@ -1,6 +1,8 @@
 {
   "dependencies": {
-    "react-router-dom": "^7.1.0"
+    "lucide-react": "^0.469.0",
+    "react-router-dom": "^7.1.0",
+    "recharts": "^2.15.0"
   },
   "devDependencies": {
     "@truffle/hdwallet-provider": "^2.1.15",
