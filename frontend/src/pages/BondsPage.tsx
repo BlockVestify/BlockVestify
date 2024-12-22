@@ -1,103 +1,187 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useUser } from '../contexts/UserContext';
-import { web3Service, Bond } from '../services/web3Service';
+import { bondService } from '../services/bondService';
+import { toast } from 'react-toastify';
+
+interface Bond {
+  id: number;
+  name: string;
+  value: string;
+  purchaseTime: string;
+  maturityTime: string;
+  interestRate: string;
+  owner: string;
+  isActive: boolean;
+}
 
 const BondsPage: React.FC = () => {
   const { user } = useUser();
+  const navigate = useNavigate();
   const [userBonds, setUserBonds] = useState<Bond[]>([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [totalValue, setTotalValue] = useState(0);
+  const [showPurchaseForm, setShowPurchaseForm] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    value: '',
+    maturityDays: '',
+    interestRate: ''
+  });
 
   useEffect(() => {
-    if (user) {
-      loadUserBonds();
-    }
-  }, [user]);
+    connectWallet();
+  }, []);
 
-  const loadUserBonds = async () => {
-    setLoading(true);
+  const connectWallet = async () => {
     try {
-      const bonds = await web3Service.getUserBonds(user!.uid);
-      setUserBonds(bonds);
-      
-      // Calculate total value
-      const total = bonds.reduce((sum, bond) => sum + (bond.currentValue || 0), 0);
-      setTotalValue(total);
+      const accounts = await bondService.connectWallet();
+      if (accounts[0]) {
+        loadUserBonds(accounts[0]);
+      }
     } catch (error: any) {
-      setError(error.message || 'Failed to load bonds');
+      toast.error(error.message);
+    }
+  };
+
+  const loadUserBonds = async (address: string) => {
+    try {
+      setLoading(true);
+      const bondIds = await bondService.getUserBonds(address);
+      const bondDetails = await Promise.all(
+        bondIds.map(id => bondService.getBondDetails(Number(id)))
+      );
+      setUserBonds(bondDetails);
+    } catch (error) {
+      toast.error('Error loading bonds');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleSell = async (bondId: string) => {
-    if (!window.confirm('Are you sure you want to sell this bond?')) {
-      return;
-    }
-
-    setLoading(true);
+  const handlePurchaseBond = async (e: React.FormEvent) => {
+    e.preventDefault();
     try {
-      await web3Service.sellBond(bondId, user!.uid);
-      await loadUserBonds(); // Refresh bonds list
-      alert('Bond sold successfully!');
-    } catch (error: any) {
-      setError(error.message || 'Failed to sell bond');
+      setLoading(true);
+      const maturityTime = Math.floor(Date.now() / 1000) + (Number(formData.maturityDays) * 86400);
+      await bondService.purchaseBond(
+        formData.name,
+        Number(formData.value),
+        maturityTime,
+        Number(formData.interestRate)
+      );
+      toast.success('Bond purchased successfully!');
+      setShowPurchaseForm(false);
+      setFormData({ name: '', value: '', maturityDays: '', interestRate: '' });
+      const accounts = await bondService.connectWallet();
+      loadUserBonds(accounts[0]);
+    } catch (error) {
+      toast.error('Error purchasing bond');
     } finally {
       setLoading(false);
     }
   };
 
-  const calculateReturns = (bond: Bond) => {
-    const currentValue = bond.currentValue || 0;
-    const originalValue = bond.value;
-    const returnPercentage = ((currentValue - originalValue) / originalValue) * 100;
-    return returnPercentage.toFixed(2);
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
   };
-
-  if (loading) {
-    return <div className="loading">Loading your bonds...</div>;
-  }
 
   return (
     <div className="bonds-page">
       <div className="bonds-header">
-        <h2>Your Active Bonds</h2>
-        <div className="total-value">
-          Total Investment Value: ${totalValue.toLocaleString()}
-        </div>
+        <h1>Your Bonds Portfolio</h1>
+        <button
+          onClick={() => setShowPurchaseForm(!showPurchaseForm)}
+          className="purchase-button"
+        >
+          {showPurchaseForm ? 'Cancel' : 'Purchase New Bond'}
+        </button>
       </div>
 
-      {error && <div className="error-message">{error}</div>}
-
-      <div className="bonds-grid">
-        {userBonds.map(bond => (
-          <div key={bond.id} className="bond-card">
-            <h3>{bond.name}</h3>
-            <div className="bond-details">
-              <p>Purchase Value: ${bond.value}</p>
-              <p>Current Value: ${bond.currentValue}</p>
-              <p>Returns: {calculateReturns(bond)}%</p>
-              <p>Interest Rate: {bond.interestRate}%</p>
-              <p>Purchase Date: {new Date(bond.purchaseTime * 1000).toLocaleDateString()}</p>
-              <p>Maturity Date: {new Date(bond.maturityTime * 1000).toLocaleDateString()}</p>
-              <button
-                onClick={() => handleSell(bond.id)}
-                disabled={loading}
-                className="sell-button"
-              >
-                {loading ? 'Processing...' : 'Sell Bond'}
-              </button>
+      {showPurchaseForm && (
+        <div className="purchase-form">
+          <h2>Purchase New Bond</h2>
+          <form onSubmit={handlePurchaseBond}>
+            <div className="form-group">
+              <label>Bond Name</label>
+              <input
+                type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleInputChange}
+                required
+              />
             </div>
-          </div>
-        ))}
+            <div className="form-group">
+              <label>Value (ETH)</label>
+              <input
+                type="number"
+                name="value"
+                value={formData.value}
+                onChange={handleInputChange}
+                required
+                step="0.01"
+              />
+            </div>
+            <div className="form-group">
+              <label>Maturity Period (Days)</label>
+              <input
+                type="number"
+                name="maturityDays"
+                value={formData.maturityDays}
+                onChange={handleInputChange}
+                required
+                min="1"
+              />
+            </div>
+            <div className="form-group">
+              <label>Interest Rate (%)</label>
+              <input
+                type="number"
+                name="interestRate"
+                value={formData.interestRate}
+                onChange={handleInputChange}
+                required
+                min="0"
+                max="100"
+              />
+            </div>
+            <button type="submit" disabled={loading}>
+              {loading ? 'Processing...' : 'Purchase Bond'}
+            </button>
+          </form>
+        </div>
+      )}
 
-        {userBonds.length === 0 && (
+      <div className="bonds-list">
+        {loading ? (
+          <div className="loading">Loading your bonds...</div>
+        ) : userBonds.length === 0 ? (
           <div className="no-bonds">
-            <p>You don't have any active bonds.</p>
-            <a href="/investments" className="browse-button">
-              Browse Available Bonds
-            </a>
+            <p>You don't have any bonds yet.</p>
+            <button onClick={() => setShowPurchaseForm(true)}>
+              Purchase Your First Bond
+            </button>
+          </div>
+        ) : (
+          <div className="bonds-grid">
+            {userBonds.map((bond) => (
+              <div 
+                key={bond.id} 
+                className="bond-card"
+                onClick={() => navigate(`/bond/${bond.id}`)}
+              >
+                <h3>{bond.name}</h3>
+                <div className="bond-info">
+                  <p>Value: {bond.value} ETH</p>
+                  <p>Interest Rate: {bond.interestRate}%</p>
+                  <p>Status: {bond.isActive ? 'Active' : 'Inactive'}</p>
+                  <p>Maturity: {new Date(Number(bond.maturityTime) * 1000).toLocaleDateString()}</p>
+                </div>
+              </div>
+            ))}
           </div>
         )}
       </div>
