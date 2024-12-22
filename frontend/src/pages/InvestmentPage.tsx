@@ -1,5 +1,10 @@
-import React from 'react';
-import { DollarSign, TrendingUp, Clock, Shield } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { useUser } from '../contexts/UserContext';
+import { web3Service, Bond } from '../services/web3Service';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import MetaMaskConnect from '../components/MetaMaskConnect';
+import '../styles/metamask.css';
 
 interface SuggestedBond {
   id: string;
@@ -46,89 +51,114 @@ const suggestedBonds: SuggestedBond[] = [
 ];
 
 const InvestmentPage: React.FC = () => {
-  const handlePurchase = (bondId: string) => {
-    // TODO: Implement purchase logic
-    console.log(`Initiating purchase for bond: ${bondId}`);
+  const { user } = useUser();
+  const navigate = useNavigate();
+  const [suggestedBondsState, setSuggestedBonds] = useState<Bond[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [selectedBond, setSelectedBond] = useState<Bond | null>(null);
+  const [connectedAddress, setConnectedAddress] = useState<string>('');
+
+  useEffect(() => {
+    loadSuggestedBonds();
+  }, []);
+
+  const loadSuggestedBonds = () => {
+    try {
+      const bonds = web3Service.generateRandomBonds(6);
+      setSuggestedBonds(bonds);
+    } catch (error: any) {
+      setError(error.message || 'Failed to load suggested bonds');
+    }
+  };
+
+  const handleMetaMaskConnect = (address: string) => {
+    setConnectedAddress(address);
+  };
+
+  const handlePurchase = async (bond: Bond) => {
+    if (!user) {
+      navigate('/auth');
+      return;
+    }
+
+    if (!connectedAddress) {
+      toast.warn('Please connect your MetaMask wallet first');
+      return;
+    }
+
+    setSelectedBond(bond);
+    setLoading(true);
+    setError('');
+
+    try {
+      await web3Service.purchaseBond(
+        bond.name,
+        bond.value,
+        bond.maturityTime,
+        bond.interestRate,
+        connectedAddress
+      );
+      
+      setSuggestedBonds(prev => prev.filter(b => b.id !== bond.id));
+      toast.success('Bond purchased successfully!');
+      navigate('/bonds');
+    } catch (error: any) {
+      console.error('Purchase error:', error);
+      setError(error.message || 'Failed to purchase bond');
+      toast.error(error.message || 'Failed to purchase bond');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="investment-page">
-      <header className="header">
-        <h2>New Investment Opportunities</h2>
-        <p className="subtitle">Discover and invest in new bonds that match your investment goals</p>
-      </header>
-
-      <div className="investment-stats">
-        <div className="stat-card">
-          <DollarSign size={24} />
-          <div className="stat-info">
-            <h3>Average Yield</h3>
-            <p>3.8%</p>
-          </div>
-        </div>
-        <div className="stat-card">
-          <TrendingUp size={24} />
-          <div className="stat-info">
-            <h3>Market Trend</h3>
-            <p>Upward</p>
-          </div>
-        </div>
-        <div className="stat-card">
-          <Clock size={24} />
-          <div className="stat-info">
-            <h3>Avg Duration</h3>
-            <p>3.3 Years</p>
-          </div>
-        </div>
-        <div className="stat-card">
-          <Shield size={24} />
-          <div className="stat-info">
-            <h3>Risk Level</h3>
-            <p>Low-Medium</p>
-          </div>
-        </div>
+      <div className="page-header">
+        <h1>Investment Opportunities</h1>
+        <p>Discover and invest in a variety of bonds</p>
       </div>
 
-      <div className="suggested-bonds">
-        <h3>Suggested Bonds</h3>
-        <div className="bonds-grid">
-          {suggestedBonds.map((bond) => (
-            <div key={bond.id} className="bond-card">
-              <div className="bond-header">
-                <h4>{bond.name}</h4>
-                <span className={`bond-type ${bond.type.toLowerCase()}`}>{bond.type}</span>
-              </div>
-              <div className="bond-details">
-                <div className="detail-row">
-                  <span className="label">Yield:</span>
-                  <span className="value highlight">{bond.yield}</span>
-                </div>
-                <div className="detail-row">
-                  <span className="label">Maturity:</span>
-                  <span className="value">{bond.maturityPeriod}</span>
-                </div>
-                <div className="detail-row">
-                  <span className="label">Min Investment:</span>
-                  <span className="value">{bond.minInvestment}</span>
-                </div>
-                <div className="detail-row">
-                  <span className="label">Risk:</span>
-                  <span className="value">{bond.risk}</span>
-                </div>
-                <div className="detail-row">
-                  <span className="label">Rating:</span>
-                  <span className="value">{bond.rating}</span>
-                </div>
-              </div>
-              <button 
-                className="purchase-button"
-                onClick={() => handlePurchase(bond.id)}
-              >
-                Purchase Bond
-              </button>
-            </div>
-          ))}
+      {!connectedAddress && (
+        <MetaMaskConnect onConnect={handleMetaMaskConnect} />
+      )}
+
+      {error && (
+        <div className="error-message">
+          {error}
         </div>
+      )}
+
+      <div className="bonds-grid">
+        {suggestedBondsState.map((bond) => (
+          <div key={bond.id} className="bond-card">
+            <div className="bond-header">
+              <h3>{bond.name}</h3>
+              <span className="bond-type">{bond.name.includes('Government') ? 'Government' : 'Corporate'}</span>
+            </div>
+            <div className="bond-details">
+              <div className="detail-row">
+                <span>Value:</span>
+                <span>${bond.value.toLocaleString()}</span>
+              </div>
+              <div className="detail-row">
+                <span>Interest Rate:</span>
+                <span>{bond.interestRate}%</span>
+              </div>
+              <div className="detail-row">
+                <span>Maturity:</span>
+                <span>{new Date(bond.maturityTime).toLocaleDateString()}</span>
+              </div>
+            </div>
+            <button
+              className="purchase-button"
+              onClick={() => handlePurchase(bond)}
+              disabled={loading || !connectedAddress}
+            >
+              {loading ? 'Processing...' : 'Purchase Bond'}
+            </button>
+          </div>
+        ))}
       </div>
     </div>
   );
