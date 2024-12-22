@@ -23,7 +23,7 @@ A decentralized application (DApp) for managing and trading bonds on the blockch
 
 1. Clone the repository:
 ```bash
-git clone [repository-url]
+git clone https://github.com/notcaliper/blockvest.git
 cd blockvest
 ```
 
