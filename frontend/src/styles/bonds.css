@@ -10,13 +10,81 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.5rem;
+  margin-bottom: 2rem;
 }
 
 .bonds-header h3 {
   font-size: 1.25rem;
   font-weight: 600;
   color: #1e293b;
+}
+
+.bonds-header h1 {
+  font-size: 2rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  color: #1a1f37;
+}
+
+.bonds-actions {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  flex: 1;
+  max-width: 400px;
+}
+
+.search-box svg {
+  color: #64748b;
+  margin-right: 0.5rem;
+}
+
+.search-box input {
+  border: none;
+  outline: none;
+  width: 100%;
+  font-size: 0.875rem;
+}
+
+.filter-button,
+.add-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.filter-button {
+  background: white;
+  border: 1px solid #e2e8f0;
+  color: #64748b;
+}
+
+.filter-button:hover {
+  background: #f8fafc;
+}
+
+.add-button {
+  background: #3b82f6;
+  border: none;
+  color: white;
+}
+
+.add-button:hover {
+  background: #2563eb;
 }
 
 .bonds-list {
@@ -63,11 +131,7 @@
 }
 
 .bonds-page {
-  padding: 24px;
-}
-
-.bonds-page .header {
-  margin-bottom: 24px;
+  padding: 2rem;
 }
 
 .bonds-page h2 {
@@ -81,4 +145,84 @@
   border-radius: 12px;
   padding: 24px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.bonds-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.bond-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s;
+}
+
+.bond-card:hover {
+  transform: translateY(-2px);
+}
+
+.bond-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.bond-header h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1a1f37;
+}
+
+.bond-type {
+  background: #f1f5f9;
+  color: #475569;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.bond-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.detail-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.detail-item .label {
+  color: #64748b;
+  font-size: 0.875rem;
+}
+
+.detail-item .value {
+  color: #1a1f37;
+  font-weight: 500;
+}
+
+.invest-button {
+  width: 100%;
+  padding: 0.75rem;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.invest-button:hover {
+  background: #2563eb;
 }

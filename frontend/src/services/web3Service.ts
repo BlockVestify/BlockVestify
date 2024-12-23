@@ -1,10 +1,25 @@
 import Web3 from 'web3';
-import { AbiItem } from 'web3-utils';
-import { Contract } from 'web3-eth-contract';
+import { db } from '../firebase/config';
+import { collection, query, where, getDocs, addDoc, updateDoc, doc } from 'firebase/firestore';
 import BondContractABI from '../contracts/BondContract.json';
 
-const BOND_CONTRACT_ADDRESS = '0x2c6A63A650D935Bc066b5313d24B9132758A3B2a';
-const web3 = new Web3('http://127.0.0.1:7545');
+// Connect to local Ganache instance
+const GANACHE_URL = 'http://127.0.0.1:8545';
+const BOND_CONTRACT_ADDRESS = '0xF555ca6EFd99aA8b36C580B883C83b2b34206Ab3';
+
+// Initialize Web3
+let web3: Web3;
+if ((window as any).ethereum) {
+    web3 = new Web3((window as any).ethereum);
+    try {
+        // Request account access
+        (window as any).ethereum.request({ method: 'eth_requestAccounts' });
+    } catch (error) {
+        console.error("User denied account access");
+    }
+} else {
+    web3 = new Web3(new Web3.providers.HttpProvider(GANACHE_URL));
+}
 
 export interface Bond {
     id: string;
@@ -16,29 +31,68 @@ export interface Bond {
     owner: string;
     isActive: boolean;
     currentValue?: number;
+    blockchainId?: string;
 }
 
 class Web3Service {
-    private contract: Contract<typeof BondContractABI>;
+    private contract: any;
 
     constructor() {
         try {
             this.contract = new web3.eth.Contract(
-                BondContractABI as AbiItem[],
+                BondContractABI.abi,
                 BOND_CONTRACT_ADDRESS
             );
         } catch (error) {
             console.error('Failed to initialize Web3Service:', error);
-            throw new Error('Failed to connect to blockchain network');
         }
     }
 
-    async getAccounts(): Promise<string[]> {
+    private async getSignerAddress(): Promise<string> {
         try {
-            return await web3.eth.getAccounts();
+            const accounts = await web3.eth.getAccounts();
+            if (!accounts || accounts.length === 0) {
+                throw new Error('No accounts found. Please connect your wallet.');
+            }
+            return accounts[0];
         } catch (error) {
-            console.error('Error getting accounts:', error);
-            throw new Error('Failed to get blockchain accounts');
+            console.error('Error getting signer:', error);
+            throw new Error('Failed to get signer. Please make sure your wallet is connected.');
+        }
+    }
+
+    async getUserBonds(userId: string): Promise<Bond[]> {
+        try {
+            // Get bonds from Firebase
+            const bondsRef = collection(db, 'bonds');
+            const q = query(bondsRef, where('owner', '==', userId));
+            const querySnapshot = await getDocs(q);
+            
+            const bonds: Bond[] = [];
+            querySnapshot.forEach((doc) => {
+                bonds.push({ id: doc.id, ...doc.data() } as Bond);
+            });
+
+            // If web3 is available, get additional blockchain data
+            if (this.contract) {
+                for (let bond of bonds) {
+                    if (bond.blockchainId) {
+                        try {
+                            const blockchainData = await this.contract.methods
+                                .getBond(bond.blockchainId)
+                                .call();
+                            bond.currentValue = Number(web3.utils.fromWei(blockchainData.currentValue, 'ether'));
+                        } catch (error) {
+                            console.error('Error getting blockchain data for bond:', error);
+                        }
+                    }
+                }
+            }
+            
+            return bonds;
+        } catch (error) {
+            console.error('Error getting user bonds:', error);
+            throw new Error('Failed to get user bonds');
         }
     }
 
@@ -47,115 +101,117 @@ class Web3Service {
         value: number,
         maturityTime: number,
         interestRate: number,
-        from: string
+        owner: string
     ): Promise<string> {
         try {
-            // Validate the address format
-            if (!Web3.utils.isAddress(from)) {
-                throw new Error('Invalid Ethereum address format');
+            const signerAddress = await this.getSignerAddress();
+            
+            const bond = {
+                name,
+                value,
+                purchaseTime: Date.now(),
+                maturityTime,
+                interestRate,
+                owner,
+                isActive: true,
+                currentValue: value
+            };
+
+            // Store in Firebase first
+            const docRef = await addDoc(collection(db, 'bonds'), bond);
+
+            // If web3 is available, also store in blockchain
+            if (this.contract) {
+                try {
+                    const valueInWei = web3.utils.toWei(value.toString(), 'ether');
+                    const result = await this.contract.methods
+                        .purchaseBond(name, valueInWei, maturityTime, interestRate)
+                        .send({ 
+                            from: signerAddress, 
+                            value: valueInWei,
+                            gas: 500000
+                        });
+                    
+                    // Update Firebase document with blockchain ID
+                    await updateDoc(doc(db, 'bonds', docRef.id), {
+                        blockchainId: result.events.BondPurchased.returnValues.bondId
+                    });
+                } catch (error: any) {
+                    console.error('Error creating bond on blockchain:', error);
+                    if (error.message.includes('User denied transaction')) {
+                        throw new Error('Transaction was rejected. Please approve the transaction in your wallet.');
+                    }
+                }
             }
 
-            const result = await this.contract.methods
-                .purchaseBond(name, value, maturityTime, interestRate)
-                .send({ from, value: Web3.utils.toWei(value.toString(), 'ether') });
-            
-            return result.events.BondPurchased.returnValues.bondId;
-        } catch (error) {
+            return docRef.id;
+        } catch (error: any) {
             console.error('Error purchasing bond:', error);
-            throw error;
+            throw new Error(error.message || 'Failed to purchase bond');
         }
     }
 
-    async sellBond(bondId: string, from: string): Promise<void> {
+    async sellBond(bondId: string): Promise<void> {
         try {
-            await this.contract.methods
-                .sellBond(bondId)
-                .send({ from, gas: 500000 });
+            const signerAddress = await this.getSignerAddress();
+            
+            const bondRef = doc(db, 'bonds', bondId);
+            const bondData = (await getDocs(query(collection(db, 'bonds'), where('id', '==', bondId)))).docs[0];
+            
+            if (!bondData) {
+                throw new Error('Bond not found');
+            }
+
+            const bond = { id: bondData.id, ...bondData.data() } as Bond;
+
+            // Update Firebase
+            await updateDoc(bondRef, { isActive: false });
+
+            // If web3 is available and bond has blockchain ID, update blockchain
+            if (this.contract && bond.blockchainId) {
+                try {
+                    await this.contract.methods
+                        .sellBond(bond.blockchainId)
+                        .send({ 
+                            from: signerAddress,
+                            gas: 500000
+                        });
+                } catch (error: any) {
+                    console.error('Error selling bond on blockchain:', error);
+                    if (error.message.includes('User denied transaction')) {
+                        throw new Error('Transaction was rejected. Please approve the transaction in your wallet.');
+                    }
+                    throw error;
+                }
+            }
         } catch (error: any) {
             console.error('Error selling bond:', error);
             throw new Error(error.message || 'Failed to sell bond');
         }
     }
 
-    async getUserBonds(address: string): Promise<Bond[]> {
-        try {
-            // Validate the address format
-            if (!Web3.utils.isAddress(address)) {
-                throw new Error('Invalid Ethereum address format');
-            }
-
-            const bondIds = await this.contract.methods.getBondsByOwner(address).call();
-            const bonds = await Promise.all(
-                bondIds.map(async (id: string) => this.getBondDetails(id))
-            );
-            return bonds;
-        } catch (error) {
-            console.error('Error fetching user bonds:', error);
-            throw error;
+    calculateCurrentValue(bond: Bond): number {
+        if (this.contract && bond.blockchainId) {
+            return bond.currentValue || bond.value;
         }
-    }
 
-    async getBondDetails(bondId: string): Promise<Bond> {
-        try {
-            const bond = await this.contract.methods
-                .getBondDetails(bondId)
-                .call();
-
-            return {
-                id: bondId,
-                name: bond.name,
-                value: Number(web3.utils.fromWei(bond.value, 'ether')),
-                purchaseTime: parseInt(bond.purchaseTime),
-                maturityTime: parseInt(bond.maturityTime),
-                interestRate: parseInt(bond.interestRate),
-                owner: bond.owner,
-                isActive: bond.isActive
-            };
-        } catch (error: any) {
-            console.error('Error getting bond details:', error);
-            throw new Error(error.message || 'Failed to get bond details');
-        }
-    }
-
-    async calculateCurrentValue(bondId: string): Promise<number> {
-        try {
-            const value = await this.contract.methods
-                .calculateCurrentValue(bondId)
-                .call();
-            return parseFloat(web3.utils.fromWei(value, 'ether'));
-        } catch (error: any) {
-            console.error('Error calculating current value:', error);
-            throw new Error(error.message || 'Failed to calculate bond value');
-        }
-    }
-
-    generateRandomBonds(count: number): Bond[] {
-        const bondTypes = ['Government', 'Corporate'];
-        const companies = ['Tesla', 'Apple', 'Microsoft', 'Amazon', 'Google'];
-        const countries = ['US', 'UK', 'Germany', 'Japan', 'Canada'];
+        const now = Date.now();
+        const timeElapsed = now - bond.purchaseTime;
+        const totalTime = bond.maturityTime - bond.purchaseTime;
+        const progress = Math.min(timeElapsed / totalTime, 1);
         
-        return Array.from({ length: count }, (_, i) => {
-            const isCorporate = Math.random() > 0.5;
-            const value = Math.floor(Math.random() * 81) + 20; // 20 to 100
-            const interestRate = Math.floor(Math.random() * 10) + 5; // 5% to 15%
-            const maturityMonths = Math.floor(Math.random() * 60) + 12; // 1 to 5 years
-            
-            const name = isCorporate
-                ? `${companies[Math.floor(Math.random() * companies.length)]} Corporate Bond`
-                : `${countries[Math.floor(Math.random() * countries.length)]} Government Bond`;
-            
-            return {
-                id: `suggested-${i}`,
-                name,
-                value,
-                purchaseTime: 0,
-                maturityTime: Date.now() + (maturityMonths * 30 * 24 * 60 * 60 * 1000),
-                interestRate,
-                owner: '',
-                isActive: true,
-                currentValue: value
-            };
-        });
+        // Simple interest calculation
+        const interest = bond.value * (bond.interestRate / 100) * progress;
+        return bond.value + interest;
+    }
+
+    async getAccounts(): Promise<string[]> {
+        try {
+            return await this.getSignerAddress().then(address => [address]);
+        } catch (error) {
+            console.error('Error getting accounts:', error);
+            throw new Error('Failed to get blockchain accounts. Please connect your wallet.');
+        }
     }
 }
 

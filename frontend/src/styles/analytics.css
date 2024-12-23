@@ -1,22 +1,156 @@
 .analytics-page {
-  padding: 24px;
+  padding: 2rem;
   height: 100%;
 }
 
-.analytics-page .header {
-  margin-bottom: 32px;
+.analytics-header {
+  margin-bottom: 2rem;
 }
 
-.analytics-page h2 {
-  font-size: 24px;
+.analytics-header h1 {
+  font-size: 2rem;
+  color: #1a1f37;
+  margin-bottom: 0.5rem;
+}
+
+.analytics-header p {
+  color: #64748b;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.stat-icon {
+  background: #f0f9ff;
+  padding: 1rem;
+  border-radius: 10px;
+  color: #3b82f6;
+}
+
+.stat-content h3 {
+  color: #64748b;
+  font-size: 0.875rem;
+  margin-bottom: 0.5rem;
+}
+
+.stat-value {
+  color: #1a1f37;
+  font-size: 1.5rem;
   font-weight: 600;
-  color: #1a1a1a;
-  margin-bottom: 8px;
 }
 
-.analytics-page .subtitle {
-  color: #666;
-  font-size: 16px;
+.charts-section {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 1.5rem;
+}
+
+.chart-card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.chart-card h3 {
+  color: #1a1f37;
+  font-size: 1.125rem;
+  margin-bottom: 1.5rem;
+}
+
+.chart-container {
+  height: 300px;
+  position: relative;
+}
+
+.chart-bars {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  height: 100%;
+  padding-top: 2rem;
+}
+
+.chart-bar {
+  width: 40px;
+  background: #3b82f6;
+  border-radius: 4px 4px 0 0;
+  position: relative;
+  transition: height 0.3s ease;
+}
+
+.bar-value {
+  position: absolute;
+  top: -25px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
+.bar-label {
+  position: absolute;
+  bottom: -25px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
+.distribution-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.distribution-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.item-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.item-label {
+  color: #64748b;
+  font-size: 0.875rem;
+}
+
+.item-value {
+  color: #1a1f37;
+  font-weight: 500;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 8px;
+  background: #f1f5f9;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.progress {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.3s ease;
 }
 
 .analytics-content {
