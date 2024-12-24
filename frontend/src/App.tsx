@@ -1,48 +1,67 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import SignupPage from './pages/SignupPage';
-import DashboardPage from './pages/DashboardPage';
-import BondsPage from './pages/BondsPage';
-import AnalyticsPage from './pages/AnalyticsPage';
-import SettingsPage from './pages/SettingsPage';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import { useAuth } from './contexts/AuthContext';
 import Layout from './components/Layout';
-import { UserProvider, useUser } from './contexts/UserContext';
-import './styles/auth.css';
-import './styles/dashboard.css';
-import './styles/bonds.css';
-import './styles/analytics.css';
-import './styles/settings.css';
-import './styles/sidebar.css';
+import { Login } from './components/Login';
+import Signup from './components/Signup';
+import Dashboard from './pages/Dashboard';
+import Bonds from './pages/Bonds';
+import Analytics from './pages/Analytics';
+import Settings from './pages/Settings';
 
-const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { user } = useUser();
-  return user ? <>{children}</> : <Navigate to="/auth" />;
+interface ProtectedRouteProps {
+  children: React.ReactNode;
+}
+
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return <>{children}</>;
 };
 
 const App: React.FC = () => {
+  const { user } = useAuth();
+
   return (
-    <UserProvider>
-      <Router>
-        <Routes>
-          <Route path="/auth" element={<SignupPage />} />
-          <Route
-            path="/*"
-            element={
-              <ProtectedRoute>
-                <Layout>
-                  <Routes>
-                    <Route path="/" element={<DashboardPage />} />
-                    <Route path="/bonds" element={<BondsPage />} />
-                    <Route path="/analytics" element={<AnalyticsPage />} />
-                    <Route path="/settings" element={<SettingsPage />} />
-                  </Routes>
-                </Layout>
-              </ProtectedRoute>
-            }
-          />
-        </Routes>
-      </Router>
-    </UserProvider>
+    <Routes>
+      {/* Public Routes */}
+      <Route
+        path="/login"
+        element={user ? <Navigate to="/dashboard" replace /> : <Login />}
+      />
+      <Route
+        path="/signup"
+        element={user ? <Navigate to="/dashboard" replace /> : <Signup />}
+      />
+
+      {/* Protected Routes */}
+      <Route
+        path="/"
+        element={
+          <ProtectedRoute>
+            <Layout />
+          </ProtectedRoute>
+        }
+      >
+        <Route index element={<Navigate to="/dashboard" replace />} />
+        <Route path="dashboard" element={<Dashboard />} />
+        <Route path="bonds" element={<Bonds />} />
+        <Route path="analytics" element={<Analytics />} />
+        <Route path="settings" element={<Settings />} />
+      </Route>
+    </Routes>
   );
 };
 

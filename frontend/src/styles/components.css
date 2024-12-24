@@ -1,0 +1,108 @@
+/* Common Component Styles */
+.card {
+  @apply rounded-lg shadow-md transition-all duration-300;
+}
+
+.card:hover {
+  @apply shadow-lg transform -translate-y-1;
+}
+
+.button {
+  @apply px-4 py-2 rounded-md transition-all duration-300;
+}
+
+.button-primary {
+  @apply bg-primary text-white hover:bg-primary-dark;
+}
+
+.button-secondary {
+  @apply bg-secondary text-white hover:opacity-90;
+}
+
+.input-field {
+  @apply w-full px-4 py-2 rounded-md border border-border focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-300;
+}
+
+.section-title {
+  @apply text-2xl font-bold mb-6 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent;
+}
+
+/* Animation Classes */
+.fade-in {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+.slide-in {
+  animation: slideIn 0.5s ease-in-out;
+}
+
+.hover-scale {
+  @apply transition-transform duration-300 hover:scale-105;
+}
+
+/* Glassmorphism */
+.glass {
+  @apply bg-white/10 backdrop-blur-lg border border-white/20;
+}
+
+/* Gradients */
+.gradient-primary {
+  @apply bg-gradient-to-r from-primary to-primary-dark;
+}
+
+.gradient-secondary {
+  @apply bg-gradient-to-r from-secondary to-primary;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Loading States */
+.loading-shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite linear;
+}
+
+@keyframes shimmer {
+  from {
+    background-position: -200% 0;
+  }
+  to {
+    background-position: 200% 0;
+  }
+}
+
+/* Responsive Utilities */
+.responsive-grid {
+  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6;
+}
+
+.responsive-padding {
+  @apply p-4 md:p-6 lg:p-8;
+}

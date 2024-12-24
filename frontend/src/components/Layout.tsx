@@ -1,16 +1,13 @@
 import React from 'react';
+import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
 
-interface LayoutProps {
-  children: React.ReactNode;
-}
-
-const Layout: React.FC<LayoutProps> = ({ children }) => {
+const Layout: React.FC = () => {
   return (
     <div className="app-layout">
       <Sidebar />
       <main className="main-content">
-        {children}
+        <Outlet />
       </main>
     </div>
   );

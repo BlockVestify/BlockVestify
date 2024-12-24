@@ -3,7 +3,6 @@ pragma solidity ^0.8.0;
 
 contract BondContract {
     struct Bond {
-        uint256 id;
         string name;
         uint256 value;
         uint256 purchaseTime;
@@ -14,92 +13,110 @@ contract BondContract {
     }
 
     mapping(uint256 => Bond) public bonds;
-    mapping(address => uint256[]) public userBonds;
-    uint256 public bondCounter;
+    uint256 public nextBondId;
+    
+    event BondCreated(uint256 bondId, address owner, uint256 value);
+    event BondSold(uint256 bondId, address owner, uint256 value);
 
-    event BondPurchased(uint256 bondId, address buyer, uint256 value);
-    event BondSold(uint256 bondId, address seller, uint256 value);
-
-    constructor() {
-        bondCounter = 0;
-    }
-
-    function purchaseBond(
-        string memory _name,
-        uint256 _value,
-        uint256 _maturityTime,
-        uint256 _interestRate
+    function createBond(
+        string memory name,
+        uint256 value,
+        uint256 maturityTime,
+        uint256 interestRate
     ) public payable returns (uint256) {
-        require(msg.value >= _value, "Insufficient payment");
-
-        uint256 bondId = bondCounter++;
+        require(msg.value == value, "Must send exact bond value");
+        
+        uint256 bondId = nextBondId++;
         bonds[bondId] = Bond({
-            id: bondId,
-            name: _name,
-            value: _value,
+            name: name,
+            value: value,
             purchaseTime: block.timestamp,
-            maturityTime: _maturityTime,
-            interestRate: _interestRate,
+            maturityTime: maturityTime,
+            interestRate: interestRate,
             owner: msg.sender,
             isActive: true
         });
 
-        userBonds[msg.sender].push(bondId);
-        emit BondPurchased(bondId, msg.sender, _value);
+        emit BondCreated(bondId, msg.sender, value);
         return bondId;
     }
 
-    function sellBond(uint256 _bondId) public {
-        Bond storage bond = bonds[_bondId];
-        require(bond.owner == msg.sender, "Not bond owner");
-        require(bond.isActive, "Bond not active");
-
-        uint256 currentValue = calculateCurrentValue(_bondId);
-        bond.isActive = false;
-        payable(msg.sender).transfer(currentValue);
-
-        emit BondSold(_bondId, msg.sender, currentValue);
-    }
-
-    function calculateCurrentValue(uint256 _bondId) public view returns (uint256) {
-        Bond storage bond = bonds[_bondId];
-        require(bond.isActive, "Bond not active");
-
-        uint256 timeElapsed = block.timestamp - bond.purchaseTime;
-        uint256 totalTime = bond.maturityTime - bond.purchaseTime;
-        
-        if (timeElapsed >= totalTime) {
-            return bond.value + (bond.value * bond.interestRate / 100);
-        }
-
-        uint256 partialInterest = (bond.value * bond.interestRate * timeElapsed) / (totalTime * 100);
-        return bond.value + partialInterest;
-    }
-
-    function getUserBonds(address _user) public view returns (uint256[] memory) {
-        return userBonds[_user];
-    }
-
-    function getBondDetails(uint256 _bondId) public view returns (
-        uint256 id,
+    function getBond(uint256 bondId) public view returns (
         string memory name,
         uint256 value,
         uint256 purchaseTime,
         uint256 maturityTime,
         uint256 interestRate,
         address owner,
-        bool isActive
+        bool isActive,
+        uint256 currentValue
     ) {
-        Bond storage bond = bonds[_bondId];
+        Bond storage bond = bonds[bondId];
+        require(bond.owner != address(0), "Bond does not exist");
+        
         return (
-            bond.id,
             bond.name,
             bond.value,
             bond.purchaseTime,
             bond.maturityTime,
             bond.interestRate,
             bond.owner,
-            bond.isActive
+            bond.isActive,
+            calculateCurrentValue(bondId)
         );
+    }
+
+    function calculateCurrentValue(uint256 bondId) public view returns (uint256) {
+        Bond storage bond = bonds[bondId];
+        require(bond.owner != address(0), "Bond does not exist");
+        
+        if (!bond.isActive) {
+            return 0;
+        }
+
+        uint256 timeElapsed = block.timestamp - bond.purchaseTime;
+        uint256 totalTime = bond.maturityTime - bond.purchaseTime;
+        
+        if (timeElapsed >= totalTime) {
+            // Bond has matured
+            return bond.value + (bond.value * bond.interestRate / 100);
+        }
+        
+        // Calculate pro-rated interest
+        uint256 progress = (timeElapsed * 100) / totalTime;
+        uint256 interest = (bond.value * bond.interestRate * progress) / 10000;
+        return bond.value + interest;
+    }
+
+    function sellBond(uint256 bondId) public {
+        Bond storage bond = bonds[bondId];
+        require(bond.owner == msg.sender, "Only bond owner can sell");
+        require(bond.isActive, "Bond is not active");
+        
+        uint256 currentValue = calculateCurrentValue(bondId);
+        bond.isActive = false;
+        
+        payable(msg.sender).transfer(currentValue);
+        emit BondSold(bondId, msg.sender, currentValue);
+    }
+
+    function getBondsByOwner(address owner) public view returns (uint256[] memory) {
+        uint256 count = 0;
+        for (uint256 i = 0; i < nextBondId; i++) {
+            if (bonds[i].owner == owner) {
+                count++;
+            }
+        }
+        
+        uint256[] memory ownerBonds = new uint256[](count);
+        uint256 index = 0;
+        for (uint256 i = 0; i < nextBondId; i++) {
+            if (bonds[i].owner == owner) {
+                ownerBonds[index] = i;
+                index++;
+            }
+        }
+        
+        return ownerBonds;
     }
 }

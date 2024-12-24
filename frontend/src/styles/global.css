@@ -1,0 +1,140 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary: theme('colors.primary.DEFAULT');
+  --primary-dark: theme('colors.primary.dark');
+  --secondary: theme('colors.secondary.DEFAULT');
+  --secondary-dark: theme('colors.secondary.dark');
+  --background: theme('colors.background');
+  --surface: theme('colors.surface');
+  --text: theme('colors.text.DEFAULT');
+  --text-secondary: theme('colors.text.secondary');
+  --error: theme('colors.error');
+  --border: theme('colors.border');
+}
+
+@layer base {
+  body {
+    @apply bg-background text-text min-h-screen font-sans antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold tracking-tight;
+  }
+}
+
+@layer components {
+  .app-layout {
+    @apply flex min-h-screen bg-background;
+  }
+
+  .sidebar {
+    @apply fixed top-0 left-0 z-40 h-screen w-64 bg-surface border-r border-border transition-transform;
+  }
+
+  .sidebar-header {
+    @apply flex h-16 items-center justify-center border-b border-border;
+  }
+
+  .sidebar-header h2 {
+    @apply text-xl font-bold text-primary;
+  }
+
+  .user-info {
+    @apply p-4 border-b border-border;
+  }
+
+  .user-email {
+    @apply text-sm text-text-secondary truncate;
+  }
+
+  .sidebar-nav {
+    @apply flex flex-col gap-1 p-4;
+  }
+
+  .nav-item {
+    @apply flex items-center gap-3 rounded-lg px-3 py-2 text-text-secondary hover:bg-background hover:text-primary transition-colors;
+  }
+
+  .nav-item.active {
+    @apply bg-primary/10 text-primary;
+  }
+
+  .main-content {
+    @apply ml-64 flex-1 p-8;
+  }
+
+  .stats-grid {
+    @apply grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4;
+  }
+
+  .stat-card {
+    @apply relative overflow-hidden rounded-lg border border-border bg-surface p-6 hover:shadow-lg transition-shadow;
+  }
+
+  .stat-card-header {
+    @apply flex items-center justify-between;
+  }
+
+  .stat-card-value {
+    @apply mt-4 text-3xl font-bold;
+  }
+
+  .stat-card-label {
+    @apply text-sm text-text-secondary;
+  }
+
+  .stat-card-icon {
+    @apply text-primary opacity-80;
+  }
+
+  .chart-card {
+    @apply rounded-lg border border-border bg-surface p-6 hover:shadow-lg transition-shadow;
+  }
+
+  .data-table {
+    @apply w-full border-collapse;
+  }
+
+  .data-table th {
+    @apply border-b border-border px-6 py-3 text-left text-sm font-semibold text-text-secondary;
+  }
+
+  .data-table td {
+    @apply border-b border-border px-6 py-4 text-sm;
+  }
+
+  .data-table tr:hover {
+    @apply bg-background;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50;
+  }
+
+  .btn-primary {
+    @apply btn bg-primary text-white hover:bg-primary-dark focus:ring-primary;
+  }
+
+  .btn-secondary {
+    @apply btn bg-secondary text-white hover:bg-secondary-dark focus:ring-secondary;
+  }
+
+  .btn-outline {
+    @apply btn border-2 border-primary text-primary hover:bg-primary hover:text-white;
+  }
+
+  .input {
+    @apply block w-full rounded-md border border-border bg-surface px-4 py-2 text-text placeholder:text-text-secondary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary;
+  }
+
+  .label {
+    @apply mb-2 block text-sm font-medium text-text;
+  }
+
+  .card {
+    @apply rounded-lg border border-border bg-surface p-6 hover:shadow-lg transition-shadow;
+  }
+}

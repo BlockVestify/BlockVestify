@@ -1,59 +1,85 @@
-import Web3 from 'web3';
-import { AbiItem } from 'web3-utils';
-import BondContractArtifact from '../../../build/contracts/BondContract.json';
+// Types
+export interface Bond {
+  id: number;
+  name: string;
+  value: number;
+  maturityTime: number;
+  interestRate: number;
+  owner: string;
+  isActive: boolean;
+}
 
 class BondService {
-    private web3: Web3;
-    private contract: any;
-    private contractAddress: string = '0x950F2Ed0248F3Fd121bee2De734616F9b9D18960';
-
-    constructor() {
-        this.web3 = new Web3(Web3.givenProvider || 'http://localhost:8545');
-        this.contract = new this.web3.eth.Contract(
-            BondContractArtifact.abi as AbiItem[],
-            this.contractAddress
-        );
+  private bonds: Bond[] = [
+    {
+      id: 1,
+      name: "Treasury Bond #A123",
+      value: 10000,
+      maturityTime: 1735686000, // Dec 31, 2024
+      interestRate: 3.5,
+      owner: "0x123...",
+      isActive: true
+    },
+    {
+      id: 2,
+      name: "Corporate Bond #B456",
+      value: 25000,
+      maturityTime: 1751277600, // Dec 31, 2025
+      interestRate: 5.2,
+      owner: "0x456...",
+      isActive: true
+    },
+    {
+      id: 3,
+      name: "Municipal Bond #C789",
+      value: 15000,
+      maturityTime: 1735686000, // Dec 31, 2024
+      interestRate: 4.1,
+      owner: "0x789...",
+      isActive: false
     }
+  ];
 
-    async connectWallet(): Promise<string[]> {
-        if (window.ethereum) {
-            try {
-                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                return accounts;
-            } catch (error) {
-                throw new Error('User denied account access');
-            }
-        }
-        throw new Error('No Ethereum wallet found');
-    }
+  async getAllBonds(): Promise<Bond[]> {
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 500));
+    return this.bonds;
+  }
 
-    async purchaseBond(name: string, value: number, maturityTime: number, interestRate: number): Promise<any> {
-        const accounts = await this.web3.eth.getAccounts();
-        return this.contract.methods.purchaseBond(name, value, maturityTime, interestRate)
-            .send({
-                from: accounts[0],
-                value: this.web3.utils.toWei(value.toString(), 'ether')
-            });
-    }
+  async getBondById(id: number): Promise<Bond | undefined> {
+    await new Promise(resolve => setTimeout(resolve, 500));
+    return this.bonds.find(bond => bond.id === id);
+  }
 
-    async sellBond(bondId: number): Promise<any> {
-        const accounts = await this.web3.eth.getAccounts();
-        return this.contract.methods.sellBond(bondId)
-            .send({ from: accounts[0] });
-    }
+  async purchaseBond(name: string, value: number, maturityTime: number, interestRate: number): Promise<Bond> {
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    const newBond: Bond = {
+      id: this.bonds.length + 1,
+      name,
+      value,
+      maturityTime,
+      interestRate,
+      owner: "0x123...", // Simulated owner address
+      isActive: true
+    };
+    this.bonds.push(newBond);
+    return newBond;
+  }
 
-    async getUserBonds(address: string): Promise<number[]> {
-        return this.contract.methods.getUserBonds(address).call();
+  async sellBond(id: number): Promise<boolean> {
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    const bond = this.bonds.find(b => b.id === id);
+    if (bond) {
+      bond.isActive = false;
+      return true;
     }
+    return false;
+  }
 
-    async getBondDetails(bondId: number): Promise<any> {
-        return this.contract.methods.getBondDetails(bondId).call();
-    }
-
-    async calculateCurrentValue(bondId: number): Promise<string> {
-        const value = await this.contract.methods.calculateCurrentValue(bondId).call();
-        return this.web3.utils.fromWei(value, 'ether');
-    }
+  async getUserBonds(owner: string): Promise<Bond[]> {
+    await new Promise(resolve => setTimeout(resolve, 500));
+    return this.bonds.filter(bond => bond.owner === owner);
+  }
 }
 
 export const bondService = new BondService();

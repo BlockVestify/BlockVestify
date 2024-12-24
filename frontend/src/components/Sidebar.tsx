@@ -1,50 +1,52 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { useUser } from '../contexts/UserContext';
 import { 
   LayoutDashboard, 
   Wallet,
   LineChart,
-  Settings,
-  LogOut
+  Settings
 } from 'lucide-react';
 
 const Sidebar: React.FC = () => {
-  const { user, logout } = useUser();
-
   return (
     <div className="sidebar">
       <div className="sidebar-header">
         <h2>BlockVest</h2>
       </div>
 
-      <div className="user-info">
-        <p className="user-email">{user?.email}</p>
-      </div>
-
       <nav className="sidebar-nav">
-        <NavLink to="/" className="nav-item">
+        <NavLink 
+          to="/dashboard" 
+          className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+        >
           <LayoutDashboard size={20} />
           Dashboard
         </NavLink>
-        <NavLink to="/bonds" className="nav-item">
+
+        <NavLink 
+          to="/bonds" 
+          className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+        >
           <Wallet size={20} />
           Bonds
         </NavLink>
-        <NavLink to="/analytics" className="nav-item">
+
+        <NavLink 
+          to="/analytics" 
+          className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+        >
           <LineChart size={20} />
           Analytics
         </NavLink>
-        <NavLink to="/settings" className="nav-item">
+
+        <NavLink 
+          to="/settings" 
+          className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+        >
           <Settings size={20} />
           Settings
         </NavLink>
       </nav>
-
-      <button onClick={logout} className="logout-button">
-        <LogOut size={20} />
-        Logout
-      </button>
     </div>
   );
 };

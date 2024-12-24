@@ -21,7 +21,7 @@ const BondsPage: React.FC = () => {
       id: 1,
       name: 'Government Bond A',
       type: 'Government',
-      value: 100,
+      value: 1000,
       rate: 5.5,
       maturity: '2025-12-31'
     },
