@@ -12,3 +12,5 @@ blockvest-backend/node_modules
 *.log
 
 
+
+.codegpt
