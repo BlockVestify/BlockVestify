@@ -1,130 +1,142 @@
-# Blockvest - Blockchain-Based Bond Investment Platform
+# 🌟 BlockVest
 
-A decentralized application (DApp) for managing and trading bonds on the blockchain. Users can purchase, sell, and track bonds with real-time updates and secure transactions.
+<div align="center">
 
-## Features
+![BlockVest Logo](https://img.shields.io/badge/🏦-BlockVest-blue)
 
-- Purchase and sell bonds using cryptocurrency
-- Real-time bond value tracking
-- Smart contract-based bond management
-- User-friendly interface for bond transactions
-- Secure authentication and authorization
-- Blockchain-based transaction history
+[![Node.js](https://img.shields.io/badge/Node.js-v14+-green.svg)](https://nodejs.org)
+[![Truffle](https://img.shields.io/badge/Truffle-v5.11.5-orange.svg)](https://trufflesuite.com)
+[![Web3.js](https://img.shields.io/badge/Web3.js-v4.16.0-blue.svg)](https://web3js.org)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-## Prerequisites
+*A next-generation decentralized investment platform powered by blockchain technology*
 
-- Node.js (v18.x or higher)
-- npm or yarn
-- MetaMask browser extension
-- Ganache (for local blockchain development)
-- Truffle Suite
+[Explore Demo](https://github.com/notcaliper/blockvest) •
+[Report Bug](https://github.com/notcaliper/blockvest/issues) •
+[Request Feature](https://github.com/notcaliper/blockvest/issues)
 
-## Installation
+</div>
 
-1. Clone the repository:
+---
+
+## 🚀 Features
+
+<div align="center">
+
+| 🔐 Security | 📊 Analytics | 💼 Management |
+|------------|-------------|---------------|
+| Smart Contract Pools | Real-time Tracking | Portfolio Management |
+| Secure Wallet Integration | Interactive Charts | Investment Strategies |
+| Transparent Transactions | Performance Metrics | Automated Trading |
+
+</div>
+
+## 🏗️ Project Structure
+
 ```bash
+blockvest/
+├── 📱 frontend/         # React-based frontend application
+├── ⚙️ backend/          # Backend server implementation
+├── 📄 contracts/        # Smart contract source files
+├── 🔧 smart-contracts/  # Additional smart contract utilities
+├── 🔄 migrations/       # Truffle migration scripts
+└── 🏗️ build/           # Compiled contracts and build artifacts
+```
+
+## 🛠️ Prerequisites
+
+- 🟢 Node.js (v14 or higher)
+- 🔶 Truffle Framework (v5.11.5)
+- 🌐 Web3.js (v4.16.0)
+- 🦊 MetaMask or similar Web3 wallet
+- ⛓️ Ganache (v7.9.2) for local development
+
+## 📦 Dependencies
+
+### Core Dependencies
+```json
+{
+  "react-router-dom": "^7.1.0",  // Application routing
+  "recharts": "^2.15.0",         // Data visualization
+  "lucide-react": "^0.469.0"     // Modern UI icons
+}
+```
+
+### Development Tools
+```json
+{
+  "@truffle/hdwallet-provider": "^2.1.15",
+  "truffle": "^5.11.5",
+  "web3": "^4.16.0",
+  "ganache": "^7.9.2"
+}
+```
+
+## 🚀 Quick Start
+
+### 1️⃣ Installation
+
+```bash
+# Clone the repository
 git clone https://github.com/notcaliper/blockvest.git
 cd blockvest
-```
 
-2. Install dependencies for the main project:
-```bash
+# Install dependencies
 npm install
+
+# Configure environment
+cp .env.example .env
 ```
 
-3. Install frontend dependencies:
+### 2️⃣ Development Setup
+
 ```bash
-cd frontend
-npm install
+# Start local blockchain
+npx ganache
+
+# Deploy smart contracts
+npx truffle compile
+npx truffle migrate
 ```
 
-4. Install backend dependencies:
+### 3️⃣ Launch Application
+
 ```bash
-cd ../blockvest-backend
-npm install
-```
+# Terminal 1: Start backend
+cd backend
+npm run dev
 
-## Configuration
-
-1. Start Ganache and create a workspace
-2. Configure MetaMask:
-   - Connect to Ganache (usually at http://localhost:8545)
-   - Import a Ganache account using its private key
-
-3. Deploy smart contracts:
-```bash
-# In the root directory
-npx truffle migrate --reset
-```
-
-4. Update contract address:
-   - Copy the deployed contract address from the migration output
-   - Update the contractAddress in `frontend/src/services/bondService.ts`
-
-## Running the Application
-
-1. Start the backend server:
-```bash
-cd blockvest-backend
-npm start
-```
-
-2. Start the frontend development server:
-```bash
+# Terminal 2: Start frontend
 cd frontend
 npm run dev
 ```
 
-3. Access the application:
-   - Open your browser and navigate to http://localhost:5173
-   - Connect your MetaMask wallet when prompted
+## 🧪 Testing
 
-## Usage
+```bash
+# Run the test suite
+npx truffle test
+```
 
-1. **Connecting Wallet**:
-   - Click "Connect Wallet" to connect your MetaMask account
-   - Approve the connection in MetaMask
+## 🚢 Deployment
 
-2. **Purchasing Bonds**:
-   - Fill in the bond details (name, value, maturity period, interest rate)
-   - Click "Purchase Bond"
-   - Confirm the transaction in MetaMask
+```bash
+# Configure network in truffle-config.js
+npx truffle migrate --network <network-name>
+```
 
-3. **Viewing Bonds**:
-   - Your purchased bonds will appear in the bonds list
-   - View details including value, maturity date, and interest rate
+## 📞 Contact & Support
 
-4. **Selling Bonds**:
-   - Select a bond from your portfolio
-   - Click "Sell Bond"
-   - Confirm the transaction in MetaMask
+<div align="center">
 
-## Smart Contract Structure
+[![Github](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/notcaliper/blockvest)
 
-The BondContract includes:
-- Bond creation and management
-- Ownership tracking
-- Value calculation
-- Maturity period handling
-- Interest rate implementation
+Need help? [Open an issue](https://github.com/notcaliper/blockvest/issues)
 
-## Technology Stack
+</div>
 
-- Frontend: React, TypeScript, Vite
-- Backend: Node.js, Express
-- Blockchain: Ethereum, Solidity
-- Development Tools: Truffle, Ganache
-- Web3 Integration: Web3.js
-- Authentication: MetaMask
+---
 
-## Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details
+<div align="center">
+Made with ❤️ by the BlockVest Team
+</div>
