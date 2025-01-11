@@ -125,6 +125,16 @@ npx truffle test
 npx truffle migrate --network <network-name>
 ```
 
+## 📜 License
+
+<div align="center">
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE) 
+
+</div>
+
+This project is protected under the terms of the [MIT License](LICENSE). Click the badge above to view the full license text.
+
 ## 📞 Contact & Support
 
 <div align="center">
