@@ -1,4 +1,4 @@
-# 🌟 BlockVest
+# 🌟 BlockVest (Development Version 1.0-dev)
 
 <div align="center">
 
@@ -8,16 +8,22 @@
 [![Truffle](https://img.shields.io/badge/Truffle-v5.11.5-orange.svg)](https://trufflesuite.com)
 [![Web3.js](https://img.shields.io/badge/Web3.js-v4.16.0-blue.svg)](https://web3js.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Development Status](https://img.shields.io/badge/Status-Development-red.svg)](https://github.com/notcaliper/blockvest)
 
 *A next-generation decentralized investment platform powered by blockchain technology*
 
 [Explore Demo](https://github.com/notcaliper/blockvest) •
 [Report Bug](https://github.com/notcaliper/blockvest/issues) •
-[Request Feature](https://github.com/notcaliper/blockvest/issues)
+[Request Feature](https://github.com/notcaliper/blockvest/issues) •
+[Security](SECURITY.md)
 
 </div>
 
 ---
+
+## ⚠️ Development Version Notice
+
+This is a development version (1.0-dev) of BlockVest. Features may be experimental and subject to change. For production use, please wait for stable release.
 
 ## 🚀 Features
 
@@ -125,6 +131,14 @@ npx truffle test
 npx truffle migrate --network <network-name>
 ```
 
+## 🔐 Security
+
+Please review our [Security Policy](SECURITY.md) for guidelines on:
+- Reporting vulnerabilities
+- Supported versions
+- Security best practices
+- Contact information
+
 ## 📜 License
 
 <div align="center">
@@ -140,6 +154,7 @@ This project is protected under the terms of the [MIT License](LICENSE). Click t
 <div align="center">
 
 [![Github](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/notcaliper/blockvest)
+[![Email](https://img.shields.io/badge/Email-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:akshaymanbhaw27@gmail.com)
 
 Need help? [Open an issue](https://github.com/notcaliper/blockvest/issues)
 
@@ -149,4 +164,6 @@ Need help? [Open an issue](https://github.com/notcaliper/blockvest/issues)
 
 <div align="center">
 Made with ❤️ by the BlockVest Team
+
+Development Version 1.0-dev
 </div>
