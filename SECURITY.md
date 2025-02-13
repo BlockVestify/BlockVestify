@@ -5,7 +5,7 @@
 We take the security of our project seriously. If you believe you have found a security vulnerability, please follow these steps:
 
 1. **Do Not** disclose the vulnerability publicly until it has been addressed by our team
-2. Email us at [security@example.com](mailto:security@example.com) with details about the vulnerability
+2. Email us at [akshaymanbhaw27@gmail.com](mailto:akshaymanbhaw27@gmail.com) with details about the vulnerability
 3. Include the following information in your report:
    - Description of the vulnerability
    - Steps to reproduce the issue
@@ -29,7 +29,7 @@ We take the security of our project seriously. If you believe you have found a s
 
 | Version | Supported          |
 | ------- | ------------------ |
-| 1.x.x   | :white_check_mark: |
+| 1.0-dev | :white_check_mark: |
 | < 1.0   | :x:                |
 
 ## Best Practices
@@ -48,4 +48,4 @@ Please refer to our documentation for security-related configuration options and
 
 ## Contact
 
-For any security-related questions, please contact us at [security@example.com](mailto:security@example.com).
+For any security-related questions, please contact us at [akshaymanbhaw27@gmail.com](mailto:akshaymanbhaw27@gmail.com).
