@@ -163,7 +163,7 @@ Need help? [Open an issue](https://github.com/notcaliper/blockvest/issues)
 ---
 
 <div align="center">
-Made with ❤️ by the BlockVest Team
+Made with ❤️ by the SmogX Team
 
 Development Version 1.0-dev
 </div>
