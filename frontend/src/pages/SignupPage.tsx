@@ -1,58 +1,41 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { doc, setDoc, collection, query, where, getDocs } from 'firebase/firestore';
-import { auth, db } from '../firebase/config';
 import { toast } from 'react-toastify';
+import { useUser } from '../contexts/UserContext';
+import type { SignupData } from '../types';
 import '../styles/auth.css';
 
 const SignupPage: React.FC = () => {
   const navigate = useNavigate();
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [mobile, setMobile] = useState('');
+  const { signup } = useUser();
   const [loading, setLoading] = useState(false);
-
-  const checkUsernameAvailability = async (username: string) => {
-    const usersRef = collection(db, 'users');
-    const q = query(usersRef, where('username', '==', username));
-    const querySnapshot = await getDocs(q);
-    return querySnapshot.empty;
-  };
+  const [formData, setFormData] = useState<SignupData>({
+    username: '',
+    email: '',
+    password: '',
+    mobile: ''
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      // Check if username is available
-      const isUsernameAvailable = await checkUsernameAvailability(username);
-      if (!isUsernameAvailable) {
-        throw new Error('Username is already taken. Please choose another one.');
-      }
-
-      // Create user in Firebase Auth
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-
-      // Store additional user data in Firestore
-      await setDoc(doc(db, 'users', user.uid), {
-        username,
-        email,
-        mobile,
-        createdAt: new Date().toISOString()
-      });
-
-      console.log('Account created successfully');
-      toast.success('Account created successfully!');
+      await signup(formData);
+      toast.success('Account created successfully! Please log in.');
       navigate('/login');
     } catch (error: any) {
-      console.error('Signup error:', error);
-      toast.error(error.message || 'Failed to create account');
+      toast.error(error.response?.data?.message || 'Failed to create account');
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData(prev => ({
+      ...prev,
+      [e.target.name]: e.target.value
+    }));
   };
 
   return (
@@ -68,22 +51,22 @@ const SignupPage: React.FC = () => {
             <label htmlFor="username">Username</label>
             <input
               id="username"
+              name="username"
               type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              placeholder="Choose a username"
+              value={formData.username}
+              onChange={handleChange}
               required
             />
           </div>
           
           <div className="form-group">
-            <label htmlFor="email">Email Address</label>
+            <label htmlFor="email">Email</label>
             <input
               id="email"
+              name="email"
               type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter your email"
+              value={formData.email}
+              onChange={handleChange}
               required
             />
           </div>
@@ -92,10 +75,10 @@ const SignupPage: React.FC = () => {
             <label htmlFor="password">Password</label>
             <input
               id="password"
+              name="password"
               type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Choose a strong password"
+              value={formData.password}
+              onChange={handleChange}
               required
             />
           </div>
@@ -104,10 +87,10 @@ const SignupPage: React.FC = () => {
             <label htmlFor="mobile">Mobile Number</label>
             <input
               id="mobile"
+              name="mobile"
               type="tel"
-              value={mobile}
-              onChange={(e) => setMobile(e.target.value)}
-              placeholder="Enter your mobile number"
+              value={formData.mobile}
+              onChange={handleChange}
               required
             />
           </div>
@@ -117,20 +100,11 @@ const SignupPage: React.FC = () => {
             disabled={loading}
             className="auth-button"
           >
-            {loading && (
-              <span className="spinner">
-                <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-              </span>
-            )}
-            {loading ? 'Creating account...' : 'Create Account'}
+            {loading ? 'Creating Account...' : 'Sign Up'}
           </button>
 
           <div className="auth-link">
-            <span>Already have an account? </span>
-            <Link to="/login">Sign in here</Link>
+            Already have an account? <Link to="/login">Sign in</Link>
           </div>
         </form>
       </div>

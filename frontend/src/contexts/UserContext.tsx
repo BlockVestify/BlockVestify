@@ -1,42 +1,64 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { onAuthStateChanged, User as FirebaseUser } from 'firebase/auth';
-import { auth } from '../firebase/config';
-
-interface UserData {
-  uid: string;
-  email: string | null;
-  username?: string;
-  mobile?: string;
-  [key: string]: any;
-}
+import { authService } from '../services/api';
+import type { User, SignupData, LoginData } from '../types';
+import { toast } from 'react-toastify';
 
 interface UserContextType {
-  user: UserData | null;
-  setUser: (user: UserData | null) => void;
+  user: User | null;
   loading: boolean;
+  login: (credentials: LoginData) => Promise<void>;
+  signup: (data: SignupData) => Promise<void>;
+  logout: () => void;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<UserData | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (firebaseUser: FirebaseUser | null) => {
-      if (firebaseUser) {
-        setUser({
-          uid: firebaseUser.uid,
-          email: firebaseUser.email,
-        });
-      } else {
-        setUser(null);
-      }
-      setLoading(false);
-    });
-
-    return () => unsubscribe();
+    checkAuth();
   }, []);
+
+  const checkAuth = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (token) {
+        const userData = await authService.getCurrentUser();
+        setUser(userData);
+      }
+    } catch (error) {
+      console.error('Auth check failed:', error);
+      localStorage.removeItem('token');
+      toast.error('Session expired. Please login again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const login = async (credentials: LoginData) => {
+    try {
+      const data = await authService.login(credentials);
+      setUser(data.user);
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const signup = async (data: SignupData) => {
+    try {
+      await authService.signup(data);
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const logout = () => {
+    authService.logout();
+    setUser(null);
+    toast.success('Logged out successfully');
+  };
 
   if (loading) {
     return (
@@ -47,7 +69,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }
 
   return (
-    <UserContext.Provider value={{ user, setUser, loading }}>
+    <UserContext.Provider value={{ user, loading, login, signup, logout }}>
       {children}
     </UserContext.Provider>
   );
