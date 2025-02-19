@@ -1,20 +1,20 @@
-# 🌟 BlockVest (Development Version 1.0-dev)
+# 🌟 BlockVestify (Development Version 1.0-dev)
 
 <div align="center">
 
-![BlockVest Logo](https://img.shields.io/badge/🏦-BlockVest-blue)
+![BlockVestify Logo](https://img.shields.io/badge/🏦-BlockVestify-blue)
 
 [![Node.js](https://img.shields.io/badge/Node.js-v14+-green.svg)](https://nodejs.org)
 [![Truffle](https://img.shields.io/badge/Truffle-v5.11.5-orange.svg)](https://trufflesuite.com)
 [![Web3.js](https://img.shields.io/badge/Web3.js-v4.16.0-blue.svg)](https://web3js.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Development Status](https://img.shields.io/badge/Status-Development-red.svg)](https://github.com/notcaliper/blockvest)
+[![Development Status](https://img.shields.io/badge/Status-Development-red.svg)](https://github.com/blockvestify/blockvestify)
 
 *A next-generation decentralized investment platform powered by blockchain technology*
 
-[Explore Demo](https://github.com/notcaliper/blockvest) •
-[Report Bug](https://github.com/notcaliper/blockvest/issues) •
-[Request Feature](https://github.com/notcaliper/blockvest/issues) •
+[Explore Demo](https://github.com/blockvestify/blockvestify) •
+[Report Bug](https://github.com/blockvestify/blockvestify/issues) •
+[Request Feature](https://github.com/blockvestify/blockvestify/issues) •
 [Security](SECURITY.md)
 
 </div>
@@ -23,7 +23,7 @@
 
 ## ⚠️ Development Version Notice
 
-This is a development version (1.0-dev) of BlockVest. Features may be experimental and subject to change. For production use, please wait for stable release.
+This is a development version (1.0-dev) of BlockVestify. Features may be experimental and subject to change. For production use, please wait for stable release.
 
 ## 🚀 Features
 
@@ -40,7 +40,7 @@ This is a development version (1.0-dev) of BlockVest. Features may be experiment
 ## 🏗️ Project Structure
 
 ```bash
-blockvest/
+blockvestify/
 ├── 📱 frontend/         # React-based frontend application
 ├── ⚙️ backend/          # Backend server implementation
 ├── 📄 contracts/        # Smart contract source files
@@ -84,8 +84,8 @@ blockvest/
 
 ```bash
 # Clone the repository
-git clone https://github.com/notcaliper/blockvest.git
-cd blockvest
+git clone https://github.com/blockvestify/blockvestify.git
+cd blockvestify
 
 # Install dependencies
 npm install
@@ -153,17 +153,18 @@ This project is protected under the terms of the [MIT License](LICENSE). Click t
 
 <div align="center">
 
-[![Github](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/notcaliper/blockvest)
+[![Github](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/blockvestify/blockvestify)
 [![Email](https://img.shields.io/badge/Email-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:akshaymanbhaw27@gmail.com)
 
-Need help? [Open an issue](https://github.com/notcaliper/blockvest/issues)
+Need help? [Open an issue](https://github.com/blockvestify/blockvestify/issues)
 
 </div>
 
 ---
 
 <div align="center">
-Made with ❤️ by the SmogX Team
+
+Made with ❤️ by the [SmogFx](https://github.com/SmogFx) Team
 
 Development Version 1.0-dev
 </div>
